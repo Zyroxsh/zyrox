@@ -1,0 +1,1 @@
+· hacer q los titulos de las webs se deslicen para verlos al completo. esto con script en js jugando con las cadenas de texto y las listas. [visual, dejar para luego]

