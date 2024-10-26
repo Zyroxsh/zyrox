@@ -17,6 +17,10 @@ header {
   text-align: center;
 }
 
+header h1 {
+  color: #ff0000;
+}
+
 nav {
   display: flex;
   align-items: center;
@@ -55,8 +59,18 @@ nav a:hover {
 
 .grid-item {
   background-color: #333;
-  border: 3px solid #000;
+  /* border: 3px solid #ff0000; */
+  border-radius: 20%;
   padding: 20px;
+  margin: 20px;
   font-size: 30px;
   text-align: center;
+}
+
+.grid-item a {
+  color: #ff0000;
+}
+
+#protfolio-web {
+  background-image: url('../assets/img/foto-perfil.jpg');
 }
